@@ -23,6 +23,7 @@ function init(self)
     self.velocity = vmath.vector3(0, 0, 0)
     self.ground_contact = false
     self.last_horiz = 1
+    self.last_tile = 0
 
     self.touch_jump_timer = 0 
 end
@@ -54,7 +55,16 @@ function update(self, dt)
 
     -- apply velocity to the player character
     go.set_position(go.get_position() + self.velocity * dt)
-        
+
+    pos = go.get_position()
+    x_tile = math.ceil(pos.x/64)    
+    y_tile = math.ceil(pos.y/64)   
+    tile = tilemap.get_tile("level#tilemap", "layer1", x_tile, y_tile) 
+    if (not (self.last_tile == tile)) then
+        print(tile)   
+        self.last_tile = tile 
+    end 
+
     -- reset volatile state
     
     self.correction = vmath.vector3()
