@@ -24,6 +24,7 @@ function init(self)
     self.ground_contact = false
     self.last_horiz = 1
     self.last_tile = 0
+    self.elapsed = 0
 
     self.touch_jump_timer = 0 
 end
@@ -61,6 +62,13 @@ function update_animation(self)
             play_animation(self, "fall")
         end
     end
+end
+
+function update_timer(self)
+    minutes = math.floor(self.elapsed/60)
+    seconds = self.elapsed % 60
+    timer = string.format("%02d:%05.2f", minutes, seconds)
+    msg.post("bg#gui", "timer", {timer=timer})
 end
 
 function update(self, dt)
@@ -106,6 +114,8 @@ function update(self, dt)
     if self.touch_jump_timer > 0 then
         self.touch_jump_timer = self.touch_jump_timer - dt
     end
+    self.elapsed = self.elapsed + dt
+    update_timer(self)
     
 end
 
