@@ -1,0 +1,6 @@
+    if message_id == hash("timer") then
+        minutes = math.floor(message['elapsed']/60)
+        seconds = message['elapsed'] % 60
+        timer = string.format("%02d:%05.2f", minutes, seconds)
+        gui.set_text(gui.get_node("timer"), "Time: "..timer)
+    end

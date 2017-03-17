@@ -1,0 +1,32 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	self.finished = false
+	msg.post("loader#game", "load")
+end
+
+function final(self)
+    -- Add finalization code here
+    -- Remove this function if not needed
+    msg.post(".", "release_input_focus")
+end
+
+function update(self, dt)
+    -- Add update code here
+    -- Remove this function if not needed
+end
+
+function reset(self)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("proxy_loaded") then
+		msg.post(sender, "enable")
+	elseif message_id == hash("proxy_unloaded") then
+		if self.finished == true then
+			msg.post("loader#end", "load")
+		end
+	elseif message_id == hash("done") then
+		self.finished = true
+    	msg.post("loader#game", "unload")
+	end
+end

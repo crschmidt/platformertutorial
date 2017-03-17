@@ -1,0 +1,46 @@
+function init(self)
+    -- Add initialization code here
+    -- Remove this function if not needed
+    msg.post(".", "acquire_input_focus")
+    
+end
+
+function final(self)
+    -- Add finalization code here
+    -- Remove this function if not needed
+end
+
+function update(self, dt)
+    -- Add update code here
+    -- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+    -- Add message-handling code here
+    -- Remove this function if not needed
+    if message_id == hash("timer") then
+        minutes = math.floor(message['elapsed']/60)
+        seconds = message['elapsed'] % 60
+        timer = string.format("%02d:%05.2f", minutes, seconds)
+        gui.set_text(gui.get_node("timer"), "Time: "..timer)
+    end
+end
+
+function on_input(self, action_id, action)
+    -- Add input-handling code here
+    -- Remove this function if not needed
+    --print(action.pressed, action.y, action.x)
+    if action.pressed then
+        print(gui.pick_node(gui.get_node("reset"), action.x, action.y))
+    end
+    if action.pressed and gui.pick_node(gui.get_node("reset"), action.x, action.y) then
+        msg.post("world:/loader", "reset")
+    end
+    
+end
+
+function on_reload(self)
+    -- Add input-handling code here
+    -- Remove this function if not needed
+end
+
