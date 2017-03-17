@@ -17,6 +17,14 @@ function update(self, dt)
 end
 
 function reset(self)
+    self.elapsed = 0
+
+    if self.finished == true then
+        self.finished = false
+        msg.post("loader#end", "unload")
+    else
+        msg.post("loader#game", "unload")
+    end
 end
 
 function on_message(self, message_id, message, sender)
@@ -28,10 +36,15 @@ function on_message(self, message_id, message, sender)
     elseif message_id == hash("proxy_unloaded") then
         if self.finished == true then
             msg.post("loader#end", "load")
+        else
+            msg.post("loader#game", "load")
         end
     elseif message_id == hash("done") then
         self.finished = true
         self.elapsed = message["elapsed"]
         msg.post("loader#game", "unload")
+    elseif message_id == hash("reset") then
+        reset(self)
     end
+    
 end
