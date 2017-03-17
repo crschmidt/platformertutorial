@@ -2,6 +2,7 @@ function init(self)
     msg.post(".", "acquire_input_focus")
     self.finished = false
     msg.post("loader#game", "load")
+    self.elapsed = 0
 end
 
 function final(self)
@@ -21,12 +22,16 @@ end
 function on_message(self, message_id, message, sender)
     if message_id == hash("proxy_loaded") then
         msg.post(sender, "enable")
+        if (self.finished == true) then
+            msg.post("default:/bg#gui", "timer", {elapsed=self.elapsed})
+        end 
     elseif message_id == hash("proxy_unloaded") then
         if self.finished == true then
             msg.post("loader#end", "load")
         end
     elseif message_id == hash("done") then
         self.finished = true
+        self.elapsed = message["elapsed"]
         msg.post("loader#game", "unload")
     end
 end
