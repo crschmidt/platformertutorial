@@ -87,9 +87,30 @@ function on_message(self, message_id, message, sender)
     end
 end
 
-function on_input(self, action_id, action)
+local function jump(self)
+    -- only allow jump from ground
+    if self.ground_contact then
+        -- set take-off speed
+        self.velocity.y = jump_takeoff_speed
+    end
+end
 
-    if action_id == hash("left") then
+local function abort_jump(self)
+    -- cut the jump short if we are still going up
+    if self.velocity.y > 0 then
+        -- scale down the upwards speed
+        self.velocity.y = self.velocity.y * 0.5
+    end
+end
+
+function on_input(self, action_id, action)
+    if action_id == hash("trigger") then
+        if action.pressed then
+            jump(self)
+        elseif action.released then
+            abort_jump(self)
+        end
+    elseif action_id == hash("left") then
         if action.pressed then
             self.move_left = true
         elseif action.released then
