@@ -14,7 +14,7 @@ function init(self)
     -- this tells the engine to send input to on_input() in this script
     msg.post(".", "acquire_input_focus")
     msg.post("camera", "acquire_camera_focus")
-    msg.post("@system:", "toggle_physics_debug")
+    --msg.post("@system:", "toggle_physics_debug")
 
     -- save the starting position
     self.position = go.get_position()
@@ -34,6 +34,35 @@ function final(self)
     msg.post("camera", "release_camera_focus")
 end
 
+function play_animation(self, anim)
+    -- only play animations which are not already playing
+    if self.anim ~= anim then
+        -- tell the sprite to play the animation
+        msg.post("#sprite", "play_animation", {id = hash(anim)})
+        -- remember which animation is playing
+        self.anim = anim
+    end
+end
+
+function update_animation(self)
+    -- make sure the player character faces the right way
+    sprite.set_hflip("#sprite", self.last_horiz == -1)
+    -- make sure the right animation is playing
+    if self.ground_contact then
+        if self.velocity.x == 0 then
+            play_animation(self, "stand")
+        else
+            play_animation(self, "run")
+        end
+    else
+        if self.velocity.y > 0 then
+            play_animation(self, "jump")
+        else
+            play_animation(self, "fall")
+        end
+    end
+end
+
 function update(self, dt)
     self.last_velocity = vmath.vector3(self.velocity)
     local gravity = vmath.vector3(0, gravity, 0)
@@ -45,8 +74,7 @@ function update(self, dt)
         self.last_horiz = 1
         self.velocity.x = velocity
     else
-        self.velocity.x = 0
-        
+        self.velocity.x = 0        
     end
     if not self.ground_contact then
         -- Apply gravity if there's no ground contact
@@ -55,6 +83,8 @@ function update(self, dt)
 
     -- apply velocity to the player character
     go.set_position(go.get_position() + self.velocity * dt)
+
+    update_animation(self)
 
     pos = go.get_position()
     x_tile = math.ceil(pos.x/64)    
