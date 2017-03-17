@@ -8,11 +8,13 @@ local velocity = 400
 
 local level = 1
 
+touch_jump_timeout = .2
+
 function init(self)
     -- this tells the engine to send input to on_input() in this script
     msg.post(".", "acquire_input_focus")
     msg.post("camera", "acquire_camera_focus")
-    --msg.post("@system:", "toggle_physics_debug")
+    msg.post("@system:", "toggle_physics_debug")
 
     -- save the starting position
     self.position = go.get_position()
@@ -20,6 +22,9 @@ function init(self)
     -- keep track of movement vector and if there is ground contact
     self.velocity = vmath.vector3(0, 0, 0)
     self.ground_contact = false
+    self.last_horiz = 1
+
+    self.touch_jump_timer = 0 
 end
 
 function final(self)
@@ -31,15 +36,17 @@ end
 function update(self, dt)
     self.last_velocity = vmath.vector3(self.velocity)
     local gravity = vmath.vector3(0, gravity, 0)
-    
+
     if self.move_left then
+        self.last_horiz = -1
         self.velocity.x = -velocity
     elseif self.move_right then
+        self.last_horiz = 1
         self.velocity.x = velocity
     else
         self.velocity.x = 0
+        
     end
-
     if not self.ground_contact then
         -- Apply gravity if there's no ground contact
         self.velocity = self.velocity + gravity
@@ -52,6 +59,10 @@ function update(self, dt)
     
     self.correction = vmath.vector3()
     self.ground_contact = false
+    if self.touch_jump_timer > 0 then
+        self.touch_jump_timer = self.touch_jump_timer - dt
+    end
+    
 end
 
 local function handle_geometry_contact(self, normal, distance) 
@@ -110,7 +121,9 @@ function on_input(self, action_id, action)
         elseif action.released then
             abort_jump(self)
         end
-    elseif action_id == hash("left") then
+    end
+
+    if action_id == hash("left") then
         if action.pressed then
             self.move_left = true
         elseif action.released then
