@@ -6,6 +6,8 @@ local jump_takeoff_speed = 900
 
 local velocity = 400
 
+local level = 1
+
 function init(self)
     -- this tells the engine to send input to on_input() in this script
     msg.post(".", "acquire_input_focus")
@@ -29,6 +31,14 @@ end
 function update(self, dt)
     self.last_velocity = vmath.vector3(self.velocity)
     local gravity = vmath.vector3(0, gravity, 0)
+    
+    if self.move_left then
+        self.velocity.x = -velocity
+    elseif self.move_right then
+        self.velocity.x = velocity
+    else
+        self.velocity.x = 0
+    end
 
     if not self.ground_contact then
         -- Apply gravity if there's no ground contact
@@ -78,6 +88,21 @@ function on_message(self, message_id, message, sender)
 end
 
 function on_input(self, action_id, action)
+
+    if action_id == hash("left") then
+        if action.pressed then
+            self.move_left = true
+        elseif action.released then
+            self.move_left = false
+        end
+    elseif action_id == hash("right") then
+        if action.pressed then
+            self.move_right = true
+        elseif action.released then
+            self.move_right = false
+        end
+    end
+
 end
 
 function on_reload(self)
