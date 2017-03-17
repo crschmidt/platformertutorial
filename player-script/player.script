@@ -63,6 +63,9 @@ function update(self, dt)
     if (not (self.last_tile == tile)) then
         print(tile)   
         self.last_tile = tile 
+        if (tile == 125) then
+            tile = tilemap.set_tile("level#tilemap", "layer1", x_tile, y_tile, 0)
+        end
     end 
 
     -- reset volatile state
